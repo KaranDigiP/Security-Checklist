@@ -9,80 +9,82 @@
 body {
   margin: 0;
   height: 100vh;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  background: linear-gradient(270deg, #ff9a9e, #fad0c4, #ffdde1);
-  background-size: 600% 600%;
-  animation: gradientShift 10s ease infinite;
-  overflow: hidden;
+  font-family: 'Comic Sans MS', cursive;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #ffc3a0);
+  background-size: 400% 400%;
+  animation: gradient 8s ease infinite;
 }
 
-@keyframes gradientShift {
+@keyframes gradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
 .container {
+  background: rgba(255,255,255,0.85);
+  padding: 50px;
+  border-radius: 30px;
   text-align: center;
-  background: rgba(255,255,255,0.8);
-  padding: 40px;
-  border-radius: 25px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
   position: relative;
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2.7rem;
   color: #ff4d6d;
-  margin-bottom: 30px;
 }
 
 button {
-  padding: 15px 30px;
-  font-size: 1.2rem;
+  padding: 15px 35px;
+  font-size: 1.3rem;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: 0.3s ease;
-  margin: 10px;
+  margin: 15px;
 }
 
 #yesBtn {
-  background-color: #ff4d6d;
+  background: #ff4d6d;
   color: white;
 }
 
 #noBtn {
-  background-color: #999;
+  background: #777;
   color: white;
   position: absolute;
-}
-
-button:hover {
-  transform: scale(1.1);
 }
 
 .cat {
   position: absolute;
   width: 120px;
+  animation: floatCats 6s ease-in-out infinite alternate;
 }
 
-.cat1 { bottom: 10px; left: 10px; }
-.cat2 { bottom: 10px; right: 10px; }
+@keyframes floatCats {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-20px); }
+}
 
-.heart {
+.cat1 { bottom: 10px; left: 20px; }
+.cat2 { bottom: 10px; right: 20px; }
+.cat3 { top: 20px; left: 40px; }
+.cat4 { top: 20px; right: 40px; }
+.cat5 { bottom: 200px; left: 50%; transform: translateX(-50%); }
+
+.heart, .paw {
   position: absolute;
-  color: red;
-  font-size: 20px;
-  animation: floatUp 4s linear infinite;
+  animation: floatUp 5s linear infinite;
 }
 
 @keyframes floatUp {
   0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-800px); opacity: 0; }
+  100% { transform: translateY(-100vh); opacity: 0; }
 }
 </style>
 </head>
@@ -90,52 +92,77 @@ button:hover {
 <body>
 
 <div class="container">
-  <h1>Will you be my Valentine? 💖</h1>
+  <h1>Will you be my Valentine? 💖🐾</h1>
   <button id="yesBtn">Yes 😍</button>
-  <button id="noBtn">No 🙃</button>
+  <button id="noBtn">No 🙅</button>
 </div>
 
+<!-- MANY CATS -->
 <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" class="cat cat1">
 <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" class="cat cat2">
+<img src="https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif" class="cat cat3">
+<img src="https://media.giphy.com/media/13borq7Zo2kulO/giphy.gif" class="cat cat4">
+<img src="https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif" class="cat cat5">
 
 <script>
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
-let yesSize = 1;
 
-noBtn.addEventListener("mouseover", function() {
-  const x = Math.random() * (window.innerWidth - 100);
-  const y = Math.random() * (window.innerHeight - 100);
+let yesScale = 1;
+let escapeCount = 0;
+let minEscapes = 6;
+
+function moveNoButton() {
+  const x = Math.random() * (window.innerWidth - 120);
+  const y = Math.random() * (window.innerHeight - 80);
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
+}
 
-  yesSize += 0.2;
-  yesBtn.style.transform = "scale(" + yesSize + ")";
+noBtn.addEventListener("mouseover", () => {
+  escapeCount++;
+  moveNoButton();
+
+  yesScale += 0.25;
+  yesBtn.style.transform = `scale(${yesScale})`;
+
+  if (escapeCount < minEscapes) {
+    setTimeout(moveNoButton, 100);
+  }
 });
 
-yesBtn.addEventListener("click", function() {
+yesBtn.addEventListener("click", () => {
   document.body.innerHTML = `
     <div style="text-align:center;">
-      <h1 style="color:#ff4d6d;font-size:3rem;">YAYYYYYY!!! 💕💕💕</h1>
+      <h1 style="font-size:3rem;color:#ff4d6d;">SHE SAID YESSSS 😭💖🐾</h1>
       <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" width="300">
     </div>
   `;
-  createHearts();
+  startCelebration();
 });
 
-function createHearts() {
+function startCelebration() {
   setInterval(() => {
     const heart = document.createElement("div");
-    heart.classList.add("heart");
+    heart.className = "heart";
     heart.innerHTML = "💖";
     heart.style.left = Math.random() * window.innerWidth + "px";
     heart.style.bottom = "0px";
     heart.style.fontSize = Math.random() * 30 + 20 + "px";
     document.body.appendChild(heart);
 
+    const paw = document.createElement("div");
+    paw.className = "paw";
+    paw.innerHTML = "🐾";
+    paw.style.left = Math.random() * window.innerWidth + "px";
+    paw.style.bottom = "0px";
+    paw.style.fontSize = Math.random() * 25 + 15 + "px";
+    document.body.appendChild(paw);
+
     setTimeout(() => {
       heart.remove();
-    }, 4000);
+      paw.remove();
+    }, 5000);
   }, 200);
 }
 </script>
