@@ -4,13 +4,18 @@
   <title>Google Security Checklist</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 p-8">
-  <h1 class="text-3xl font-bold mb-8">Google Security Checklist</h1>
-  <div id="app" class="space-y-10"></div>
+
+<h1 class="text-3xl font-bold mb-8 text-gray-800">
+  Google Security Checklist
+</h1>
+
+<div id="app" class="space-y-12"></div>
 
 <script>
-const checklist = [
 
+const checklist = [
 {
 section: "Administrator Accounts",
 controls: [
@@ -21,7 +26,6 @@ controls: [
 {name:"Login challenges enabled",desc:"Suspicious login protection",options:["Enforced for All Users","Enforced for High-Risk Users Only","Optional","Not Enabled"]},
 {name:"Vault admins protected like super admins",desc:"Same level protection",options:["Same Controls as Super Admins","MFA Only","Standard Protection","Not Applicable"]}
 ]},
-
 {
 section:"User Account Security",
 controls:[
@@ -32,7 +36,6 @@ controls:[
 {name:"Google Takeout restricted",desc:"Data download controlled",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled with Monitoring","Fully Enabled"]},
 {name:"Offboarding process defined",desc:"Immediate access revocation",options:["Immediate Suspension + Data Review","Suspension Only","Manual Process","No Formal Process"]}
 ]},
-
 {
 section:"App & Third-Party Access Control",
 controls:[
@@ -42,21 +45,18 @@ controls:[
 {name:"Context-Aware Access enabled",desc:"Device/IP-based access control",options:["Enforced (Device + IP)","Enforced (IP Only)","Enforced (Device Only)","Not Configured"]},
 {name:"Client-side encryption evaluated",desc:"Encryption for sensitive data",options:["Enabled for Sensitive OUs","Enabled Org-Wide","Evaluated but Deferred","Not Evaluated"]}
 ]},
-
 {
 section:"Calendar Security",
 controls:[
 {name:"External sharing limited to free/busy",desc:"Restrict event details",options:["Free/Busy Only","Limited Details","Full Details","Public"]},
 {name:"External guest warning enabled",desc:"Alert on outside invites",options:["Enabled Org-Wide","Enabled for Selected OUs","Disabled"]}
 ]},
-
 {
 section:"Google Chat Controls",
 controls:[
 {name:"External chat restricted",desc:"Limit outside messaging",options:["Disabled Org-Wide","Allowed for Selected OUs","Fully Enabled"]},
 {name:"Chat invitation policy set",desc:"Auto-accept rules defined",options:["Manual Approval Required","Auto Accept Internal Only","Fully Automatic","Not Configured"]}
 ]},
-
 {
 section:"Chrome & Browser Policies",
 controls:[
@@ -67,7 +67,6 @@ controls:[
 {name:"SitePerProcess enabled",desc:"Process isolation enabled",options:["Enabled","Disabled","Not Managed"]},
 {name:"AllowedDomainsForApps configured",desc:"Domain restriction policy",options:["Restricted to Company Domains","Restricted + Trusted Domains","Not Configured"]}
 ]},
-
 {
 section:"Endpoint & Device Management",
 controls:[
@@ -76,7 +75,6 @@ controls:[
 {name:"Screen lock enforced",desc:"Mandatory device lock",options:["Mandatory with Timeout Policy","Mandatory without Timeout","Not Enforced"]},
 {name:"Admin access restricted to managed devices",desc:"Privileged device control",options:["Required for All Admin Roles","Required for Super Admins Only","Not Restricted"]}
 ]},
-
 {
 section:"Google Drive Security",
 controls:[
@@ -90,7 +88,6 @@ controls:[
 {name:"Desktop sync restricted",desc:"Limit Drive for desktop",options:["Disabled Org-Wide","Restricted to Specific Users","Fully Enabled"]},
 {name:"DLP rules configured",desc:"Sensitive data detection",options:["Block Sensitive Data Sharing","Warn Only","Monitor Only","Not Configured"]}
 ]},
-
 {
 section:"Gmail Security",
 controls:[
@@ -107,7 +104,6 @@ controls:[
 {name:"Spam filter not bypassed internally",desc:"No spoof loopholes",options:["Bypass Disabled","Bypass Enabled for Specific Groups","Bypass Fully Enabled"]},
 {name:"DLP scanning for outgoing email",desc:"Sensitive data blocking",options:["Block Sensitive Content","Warn Only","Monitor Only","Not Configured"]}
 ]},
-
 {
 section:"Google Groups Security",
 controls:[
@@ -117,20 +113,17 @@ controls:[
 {name:"Public access disabled",desc:"No internet access",options:["Disabled","Restricted","Public"]},
 {name:"Spam moderation enabled",desc:"Reduce phishing",options:["Auto Reject Spam","Moderator Approval Required","Not Enabled"]}
 ]},
-
 {
 section:"Google Sites",
 controls:[
 {name:"External site sharing blocked",desc:"Prevent public leaks",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Fully Enabled"]}
 ]},
-
 {
 section:"Vault",
 controls:[
 {name:"Vault admin accounts protected",desc:"Treated like super admins",options:["MFA + Security Keys Required","MFA Required","Standard Protection"]},
 {name:"Vault activity audited regularly",desc:"Monitor exports & retention",options:["Monthly","Quarterly","Annually","Not Reviewed"]}
 ]},
-
 {
 section:"Monitoring & Audit",
 controls:[
@@ -140,34 +133,74 @@ controls:[
 ]}
 ];
 
-// Render UI
+// ----- UI Rendering -----
+
 const app = document.getElementById("app");
 
 checklist.forEach(section => {
+
   const wrapper = document.createElement("div");
-  wrapper.className = "bg-white p-6 rounded-xl shadow";
-  wrapper.innerHTML = `<h2 class="text-xl font-semibold mb-4">${section.section}</h2>`;
+  wrapper.className = "bg-white p-6 rounded-xl shadow border border-gray-200";
+
+  wrapper.innerHTML = `
+    <h2 class="text-xl font-semibold mb-6 text-gray-700">
+      ${section.section}
+    </h2>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left border border-gray-200">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+          <tr>
+            <th class="px-4 py-3 border">Control</th>
+            <th class="px-4 py-3 border">Description</th>
+            <th class="px-4 py-3 border">Status</th>
+            <th class="px-4 py-3 border">Owner</th>
+            <th class="px-4 py-3 border">Evidence / Notes</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-${section.section.replace(/\s+/g,'-')}">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  app.appendChild(wrapper);
+
+  const tbody = wrapper.querySelector("tbody");
 
   section.controls.forEach(control => {
-    const div = document.createElement("div");
-    div.className = "mb-4";
 
     let optionsHTML = control.options.map(opt => `<option>${opt}</option>`).join("");
 
-    div.innerHTML = `
-      <label class="font-medium">${control.name}</label>
-      <p class="text-sm text-gray-500 mb-1">${control.desc}</p>
-      <select class="w-full p-2 border rounded">
-        <option value="">Select status</option>
-        ${optionsHTML}
-      </select>
+    const row = document.createElement("tr");
+    row.className = "hover:bg-gray-50";
+
+    row.innerHTML = `
+      <td class="px-4 py-3 border font-medium text-gray-700">
+        ${control.name}
+      </td>
+      <td class="px-4 py-3 border text-gray-600">
+        ${control.desc}
+      </td>
+      <td class="px-4 py-3 border">
+        <select class="w-full p-2 border rounded text-sm">
+          <option value="">Select status</option>
+          ${optionsHTML}
+        </select>
+      </td>
+      <td class="px-4 py-3 border">
+        <input type="text" class="w-full p-2 border rounded text-sm" placeholder="Owner name">
+      </td>
+      <td class="px-4 py-3 border">
+        <input type="text" class="w-full p-2 border rounded text-sm" placeholder="Evidence link / Notes">
+      </td>
     `;
 
-    wrapper.appendChild(div);
+    tbody.appendChild(row);
   });
 
-  app.appendChild(wrapper);
 });
+
 </script>
 
 </body>
