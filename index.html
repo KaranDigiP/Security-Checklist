@@ -3,22 +3,66 @@
 <head>
   <title>Google Security Checklist</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body class="bg-gray-100 p-8">
 
-<h1 class="text-3xl font-bold mb-8 text-gray-800">
+<!-- ACCESS CONTROL -->
+<div id="authScreen" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+  <div class="bg-white p-8 rounded-xl shadow w-96">
+    <h2 class="text-xl font-semibold mb-4">Restricted Access</h2>
+    <input type="password" id="passwordInput"
+      class="w-full p-2 border rounded mb-4"
+      placeholder="Enter access password">
+    <button onclick="checkPassword()"
+      class="w-full bg-blue-600 text-white p-2 rounded">
+      Access
+    </button>
+  </div>
+</div>
+
+<h1 class="text-3xl font-bold mb-6 text-gray-800">
   Google Security Checklist
 </h1>
+
+<button onclick="exportPDF()" class="mb-6 bg-gray-800 text-white px-4 py-2 rounded">
+Export to PDF
+</button>
+
+<!-- Overall Completion -->
+<div class="mb-8">
+  <div class="flex justify-between mb-1">
+    <span class="text-sm font-medium text-gray-700">Overall Completion</span>
+    <span id="overallPercent" class="text-sm text-gray-700">0%</span>
+  </div>
+  <div class="w-full bg-gray-200 rounded-full h-3">
+    <div id="overallBar" class="bg-green-500 h-3 rounded-full" style="width:0%"></div>
+  </div>
+</div>
 
 <div id="app" class="space-y-12"></div>
 
 <script>
 
+// CHANGE THIS PASSWORD
+const ACCESS_PASSWORD = "ChangeThisPassword123";
+
+function checkPassword() {
+  const input = document.getElementById("passwordInput").value;
+  if (input === ACCESS_PASSWORD) {
+    document.getElementById("authScreen").style.display = "none";
+  } else {
+    alert("Unauthorized Access");
+  }
+}
+
+// ---- FULL CHECKLIST DATA (ALL 13 SECTIONS) ----
+
 const checklist = [
 {
-section: "Administrator Accounts",
-controls: [
+section:"Administrator Accounts",
+controls:[
 {name:"Super Admin accounts minimized",desc:"Limit number of super admins",options:["1 Super Admin","2 Super Admins (Recommended)","3–5 Super Admins","More than 5","Not Reviewed"]},
 {name:"Security keys enforced for admins",desc:"FIDO2 keys required",options:["Required for All Admins","Required for Super Admins Only","Optional","Not Enforced"]},
 {name:"Admin email alerts enabled",desc:"Risk alerts configured",options:["Enabled for All Risk Events","Enabled for Critical Events Only","Partially Configured","Not Enabled"]},
@@ -143,23 +187,19 @@ checklist.forEach(section => {
   wrapper.className = "bg-white p-6 rounded-xl shadow border border-gray-200";
 
   wrapper.innerHTML = `
-    <h2 class="text-xl font-semibold mb-6 text-gray-700">
-      ${section.section}
-    </h2>
-
+    <h2 class="text-xl font-semibold mb-6 text-gray-700">${section.section}</h2>
     <div class="overflow-x-auto">
-      <table class="min-w-full text-sm text-left border border-gray-200">
-        <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+      <table class="min-w-full text-sm border border-gray-200">
+        <thead class="bg-gray-50 text-xs uppercase text-gray-600">
           <tr>
-            <th class="px-4 py-3 border">Control</th>
-            <th class="px-4 py-3 border">Description</th>
-            <th class="px-4 py-3 border">Status</th>
-            <th class="px-4 py-3 border">Owner</th>
-            <th class="px-4 py-3 border">Evidence / Notes</th>
+            <th class="px-4 py-2 border">Control</th>
+            <th class="px-4 py-2 border">Description</th>
+            <th class="px-4 py-2 border">Status *</th>
+            <th class="px-4 py-2 border">Owner</th>
+            <th class="px-4 py-2 border">Evidence</th>
           </tr>
         </thead>
-        <tbody id="tbody-${section.section.replace(/\s+/g,'-')}">
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
   `;
@@ -173,26 +213,21 @@ checklist.forEach(section => {
     let optionsHTML = control.options.map(opt => `<option>${opt}</option>`).join("");
 
     const row = document.createElement("tr");
-    row.className = "hover:bg-gray-50";
 
     row.innerHTML = `
-      <td class="px-4 py-3 border font-medium text-gray-700">
-        ${control.name}
-      </td>
-      <td class="px-4 py-3 border text-gray-600">
-        ${control.desc}
-      </td>
-      <td class="px-4 py-3 border">
-        <select class="w-full p-2 border rounded text-sm">
+      <td class="px-4 py-2 border font-medium">${control.name}</td>
+      <td class="px-4 py-2 border text-gray-600">${control.desc}</td>
+      <td class="px-4 py-2 border">
+        <select required class="status w-full p-1 border rounded">
           <option value="">Select status</option>
           ${optionsHTML}
         </select>
       </td>
-      <td class="px-4 py-3 border">
-        <input type="text" class="w-full p-2 border rounded text-sm" placeholder="Owner name">
+      <td class="px-4 py-2 border">
+        <input type="text" class="w-full p-1 border rounded">
       </td>
-      <td class="px-4 py-3 border">
-        <input type="text" class="w-full p-2 border rounded text-sm" placeholder="Evidence link / Notes">
+      <td class="px-4 py-2 border">
+        <input type="text" class="w-full p-1 border rounded">
       </td>
     `;
 
@@ -200,6 +235,34 @@ checklist.forEach(section => {
   });
 
 });
+
+// ----- Completion + Validation -----
+
+function updateCompletion() {
+  const selects = document.querySelectorAll(".status");
+  let filled = 0;
+
+  selects.forEach(select => {
+    if (select.value) {
+      filled++;
+      select.classList.remove("border-red-500");
+    } else {
+      select.classList.add("border-red-500");
+    }
+  });
+
+  const percent = Math.round((filled / selects.length) * 100);
+  document.getElementById("overallPercent").innerText = percent + "%";
+  document.getElementById("overallBar").style.width = percent + "%";
+}
+
+document.addEventListener("change", updateCompletion);
+
+// ----- PDF Export -----
+
+function exportPDF() {
+  html2pdf().from(document.body).save("Google_Security_Checklist.pdf");
+}
 
 </script>
 
