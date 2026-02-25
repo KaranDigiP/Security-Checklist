@@ -2,85 +2,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Google Security Checklist - Premium</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<title>Google Security Checklist - Full Compliance Engine</title>
 
-  <style>
-    html { scroll-behavior: smooth; }
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    body {
-      margin:0;
-      background: linear-gradient(135deg,#dbeafe,#f8fafc);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    /* Subtle parallax */
-    body::before {
-      content:'';
-      position:fixed;
-      top:-50%;
-      left:-50%;
-      width:200%;
-      height:200%;
-      background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.15), transparent 60%),
-                  radial-gradient(circle at 70% 70%, rgba(16,185,129,0.15), transparent 60%);
-      z-index:-1;
-      animation: float 20s infinite linear;
-    }
-
-    @keyframes float {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .glass {
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(22px) saturate(180%);
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,0.4);
-      box-shadow:0 8px 32px rgba(0,0,0,0.1);
-    }
-
-    .side-nav {
-      position:fixed;
-      left:20px;
-      top:120px;
-      width:250px;
-      max-height:70vh;
-      overflow:auto;
-    }
-
-    .side-nav button {
-      width:100%;
-      text-align:left;
-      padding:8px 12px;
-      border-radius:10px;
-      transition:0.2s;
-    }
-
-    .side-nav button:hover {
-      background:#e0e7ff;
-      transform:translateX(4px);
-    }
-
-    .btn {
-      padding:10px 16px;
-      border-radius:12px;
-      font-weight:500;
-      transition:0.2s;
-    }
-
-    .btn:hover {
-      transform:scale(1.05);
-      box-shadow:0 4px 14px rgba(0,0,0,0.15);
-    }
-  </style>
+<style>
+html { scroll-behavior: smooth; }
+body {
+  margin:0;
+  background: linear-gradient(135deg,#dbeafe,#f8fafc);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.glass {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(22px) saturate(180%);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.4);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
+}
+.btn {
+  padding:10px 16px;
+  border-radius:12px;
+  font-weight:500;
+  transition:0.2s;
+}
+.btn:hover {
+  transform:scale(1.05);
+  box-shadow:0 4px 14px rgba(0,0,0,0.15);
+}
+</style>
 </head>
 
 <body class="p-8 text-slate-800">
-
 <!-- PASSWORD -->
 <div id="authScreen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
   <div class="bg-white p-10 rounded-2xl shadow-2xl w-96 text-center">
@@ -95,8 +50,7 @@
   </div>
 </div>
 
-<!-- HEADER -->
-<div class="glass p-6 mb-8 ml-72">
+<div class="glass p-6 mb-8">
   <div class="flex justify-between items-center flex-wrap gap-4">
     <h1 class="text-3xl font-bold">Google Security Checklist</h1>
     <div class="flex gap-3 flex-wrap">
@@ -111,7 +65,7 @@
 
   <div class="mt-6">
     <div class="flex justify-between text-sm mb-2">
-      <span>Overall Completion</span>
+      <span>Overall Compliance</span>
       <span id="overallPercent" class="font-semibold text-indigo-600">0%</span>
     </div>
     <div class="w-full bg-slate-200 rounded-full h-3">
@@ -120,13 +74,9 @@
   </div>
 </div>
 
-<!-- SIDE NAV -->
-<div class="side-nav glass p-4 hidden lg:block" id="sideNav"></div>
-
-<div id="app" class="space-y-8 ml-72"></div>
+<div id="app" class="space-y-8"></div>
 
 <script>
-
 const ACCESS_PASSWORD = "Password";
 
 function checkPassword() {
@@ -135,153 +85,156 @@ function checkPassword() {
   } else alert("Incorrect Password");
 }
 
-/* LOAD previous checklist data */
-const checklist =  [
+function makeOptions(arr){
+  return arr.map((label,index)=>{
+    let score = 0;
+    if(index===0) score=100;
+    else if(index===1) score=80;
+    else if(index===2) score=40;
+    else score=0;
+    return {label,score};
+  });
+}
+
+const checklist = [
 
 {
 section:"Administrator Accounts",
 controls:[
-{name:"Super Admin accounts minimized",desc:"Limit number of super admins",options:["1 Super Admin","2 Super Admins (Recommended)","3–5 Super Admins","More than 5","Not Reviewed"]},
-{name:"Security keys enforced for admins",desc:"FIDO2 keys required",options:["Required for All Admins","Required for Super Admins Only","Optional","Not Enforced"]},
-{name:"Admin email alerts enabled",desc:"Risk alerts configured",options:["Enabled for All Risk Events","Enabled for Critical Events Only","Partially Configured","Not Enabled"]},
-{name:"Admin activity reviewed monthly",desc:"Audit logs reviewed",options:["Weekly","Monthly","Quarterly","Not Reviewed"]},
-{name:"Login challenges enabled",desc:"Suspicious login protection",options:["Enforced for All Users","Enforced for High-Risk Users Only","Optional","Not Enabled"]},
-{name:"Vault admins protected like super admins",desc:"Same level protection",options:["Same Controls as Super Admins","MFA Only","Standard Protection","Not Applicable"]}
+{name:"Super Admin accounts minimized",desc:"Limit number of super admins",recommended:"2 Super Admins (Recommended)",options:makeOptions(["2 Super Admins (Recommended)","1 Super Admin","3–5 Super Admins","More than 5","Not Reviewed"])},
+{name:"Security keys enforced for admins",desc:"FIDO2 keys required",recommended:"Required for All Admins",options:makeOptions(["Required for All Admins","Required for Super Admins Only","Optional","Not Enforced"])},
+{name:"Admin email alerts enabled",desc:"Risk alerts configured",recommended:"Enabled for All Risk Events",options:makeOptions(["Enabled for All Risk Events","Enabled for Critical Events Only","Partially Configured","Not Enabled"])},
+{name:"Admin activity reviewed monthly",desc:"Audit logs reviewed",recommended:"Monthly",options:makeOptions(["Monthly","Weekly","Quarterly","Not Reviewed"])},
+{name:"Login challenges enabled",desc:"Suspicious login protection",recommended:"Enforced for All Users",options:makeOptions(["Enforced for All Users","Enforced for High-Risk Users Only","Optional","Not Enabled"])},
+{name:"Vault admins protected like super admins",desc:"Same level protection",recommended:"Same Controls as Super Admins",options:makeOptions(["Same Controls as Super Admins","MFA Only","Standard Protection","Not Applicable"])}
 ]},
 
 {
 section:"User Account Security",
 controls:[
-{name:"2-Step Verification enforced",desc:"MFA required for all users",options:["Enforced for All Users","Enforced for Admins Only","Optional","Not Enabled"]},
-{name:"Password reuse prevention enabled",desc:"Password Alert active",options:["Enabled Org-Wide","Enabled for Selected OUs","Not Enabled","Not Deployed"]},
-{name:"Unique password policy enforced",desc:"Strong password standards",options:["Strong Policy (Length + Complexity)","Basic Policy","Default Google Policy","Not Enforced"]},
-{name:"Compromised account process defined",desc:"Suspend + investigate procedure",options:["Auto Suspend + Investigation Workflow","Manual Investigation","Ad-hoc Handling","No Defined Process"]},
-{name:"Google Takeout restricted",desc:"Data download controlled",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled with Monitoring","Fully Enabled"]},
-{name:"Offboarding process defined",desc:"Immediate access revocation",options:["Immediate Suspension + Data Review","Suspension Only","Manual Process","No Formal Process"]}
+{name:"2-Step Verification enforced",desc:"MFA required for all users",recommended:"Enforced for All Users",options:makeOptions(["Enforced for All Users","Enforced for Admins Only","Optional","Not Enabled"])},
+{name:"Password reuse prevention enabled",desc:"Password Alert active",recommended:"Enabled Org-Wide",options:makeOptions(["Enabled Org-Wide","Enabled for Selected OUs","Not Enabled","Not Deployed"])},
+{name:"Unique password policy enforced",desc:"Strong password standards",recommended:"Strong Policy (Length + Complexity)",options:makeOptions(["Strong Policy (Length + Complexity)","Basic Policy","Default Google Policy","Not Enforced"])},
+{name:"Compromised account process defined",desc:"Suspend + investigate procedure",recommended:"Auto Suspend + Investigation Workflow",options:makeOptions(["Auto Suspend + Investigation Workflow","Manual Investigation","Ad-hoc Handling","No Defined Process"])},
+{name:"Google Takeout restricted",desc:"Data download controlled",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled with Monitoring","Fully Enabled"])},
+{name:"Offboarding process defined",desc:"Immediate access revocation",recommended:"Immediate Suspension + Data Review",options:makeOptions(["Immediate Suspension + Data Review","Suspension Only","Manual Process","No Formal Process"])}
 ]},
 
 {
 section:"App & Third-Party Access Control",
 controls:[
-{name:"Third-party app access reviewed",desc:"OAuth apps audited",options:["Reviewed Monthly","Reviewed Quarterly","Reviewed Annually","Not Reviewed"]},
-{name:"Less secure apps blocked",desc:"No basic auth apps allowed",options:["Blocked Org-Wide","Blocked for Most Users","Allowed for Specific Accounts","Fully Allowed"]},
-{name:"Trusted app allowlist created",desc:"Approved apps only",options:["Allowlist Only Mode","Allowlist + Trusted Apps","Partial Restrictions","No Restrictions"]},
-{name:"Context-Aware Access enabled",desc:"Device/IP-based access control",options:["Enforced (Device + IP)","Enforced (IP Only)","Enforced (Device Only)","Not Configured"]},
-{name:"Client-side encryption evaluated",desc:"Encryption for sensitive data",options:["Enabled for Sensitive OUs","Enabled Org-Wide","Evaluated but Deferred","Not Evaluated"]}
+{name:"Third-party app access reviewed",desc:"OAuth apps audited",recommended:"Reviewed Monthly",options:makeOptions(["Reviewed Monthly","Reviewed Quarterly","Reviewed Annually","Not Reviewed"])},
+{name:"Less secure apps blocked",desc:"No basic auth apps allowed",recommended:"Blocked Org-Wide",options:makeOptions(["Blocked Org-Wide","Blocked for Most Users","Allowed for Specific Accounts","Fully Allowed"])},
+{name:"Trusted app allowlist created",desc:"Approved apps only",recommended:"Allowlist Only Mode",options:makeOptions(["Allowlist Only Mode","Allowlist + Trusted Apps","Partial Restrictions","No Restrictions"])},
+{name:"Context-Aware Access enabled",desc:"Device/IP-based access control",recommended:"Enforced (Device + IP)",options:makeOptions(["Enforced (Device + IP)","Enforced (IP Only)","Enforced (Device Only)","Not Configured"])},
+{name:"Client-side encryption evaluated",desc:"Encryption for sensitive data",recommended:"Enabled for Sensitive OUs",options:makeOptions(["Enabled for Sensitive OUs","Enabled Org-Wide","Evaluated but Deferred","Not Evaluated"])}
 ]},
 
 {
 section:"Calendar Security",
 controls:[
-{name:"External sharing limited to free/busy",desc:"Restrict event details",options:["Free/Busy Only","Limited Details","Full Details","Public"]},
-{name:"External guest warning enabled",desc:"Alert on outside invites",options:["Enabled Org-Wide","Enabled for Selected OUs","Disabled"]}
+{name:"External sharing limited to free/busy",desc:"Restrict event details",recommended:"Free/Busy Only",options:makeOptions(["Free/Busy Only","Limited Details","Full Details","Public"])},
+{name:"External guest warning enabled",desc:"Alert on outside invites",recommended:"Enabled Org-Wide",options:makeOptions(["Enabled Org-Wide","Enabled for Selected OUs","Disabled"])}
 ]},
 
 {
 section:"Google Chat Controls",
 controls:[
-{name:"External chat restricted",desc:"Limit outside messaging",options:["Disabled Org-Wide","Allowed for Selected OUs","Fully Enabled"]},
-{name:"Chat invitation policy set",desc:"Auto-accept rules defined",options:["Manual Approval Required","Auto Accept Internal Only","Fully Automatic","Not Configured"]}
+{name:"External chat restricted",desc:"Limit outside messaging",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Allowed for Selected OUs","Fully Enabled"])},
+{name:"Chat invitation policy set",desc:"Auto-accept rules defined",recommended:"Manual Approval Required",options:makeOptions(["Manual Approval Required","Auto Accept Internal Only","Fully Automatic","Not Configured"])}
 ]},
 
 {
 section:"Chrome & Browser Policies",
 controls:[
-{name:"Chrome auto-updates enabled",desc:"Browser always updated",options:["Auto Update + Forced Restart","Auto Update (User Restart)","Manual Updates","Not Managed"]},
-{name:"Force relaunch policy set",desc:"Enforce update restart",options:["Forced After Deadline","User Reminder Only","Not Configured"]},
-{name:"Safe Browsing always enabled",desc:"Phishing protection active",options:["Always Enforced","Standard Mode","User Controlled","Disabled"]},
-{name:"Malicious download blocking enabled",desc:"Download restrictions set",options:["Block Dangerous & Malicious","Block Malicious Only","Warn Only","No Restriction"]},
-{name:"SitePerProcess enabled",desc:"Process isolation enabled",options:["Enabled","Disabled","Not Managed"]},
-{name:"AllowedDomainsForApps configured",desc:"Domain restriction policy",options:["Restricted to Company Domains","Restricted + Trusted Domains","Not Configured"]}
+{name:"Chrome auto-updates enabled",desc:"Browser always updated",recommended:"Auto Update + Forced Restart",options:makeOptions(["Auto Update + Forced Restart","Auto Update (User Restart)","Manual Updates","Not Managed"])},
+{name:"Force relaunch policy set",desc:"Enforce update restart",recommended:"Forced After Deadline",options:makeOptions(["Forced After Deadline","User Reminder Only","Not Configured"])},
+{name:"Safe Browsing always enabled",desc:"Phishing protection active",recommended:"Always Enforced",options:makeOptions(["Always Enforced","Standard Mode","User Controlled","Disabled"])},
+{name:"Malicious download blocking enabled",desc:"Download restrictions set",recommended:"Block Dangerous & Malicious",options:makeOptions(["Block Dangerous & Malicious","Block Malicious Only","Warn Only","No Restriction"])},
+{name:"SitePerProcess enabled",desc:"Process isolation enabled",recommended:"Enabled",options:makeOptions(["Enabled","Disabled","Not Managed"])},
+{name:"AllowedDomainsForApps configured",desc:"Domain restriction policy",recommended:"Restricted to Company Domains",options:makeOptions(["Restricted to Company Domains","Restricted + Trusted Domains","Not Configured"])}
 ]},
 
 {
 section:"Endpoint & Device Management",
 controls:[
-{name:"Device management enabled",desc:"Endpoint control active",options:["Advanced Management","Basic Management","Not Enabled"]},
-{name:"Device encryption enforced",desc:"Full disk encryption required",options:["Required Org-Wide","Required for Admins Only","Recommended Only","Not Enforced"]},
-{name:"Screen lock enforced",desc:"Mandatory device lock",options:["Mandatory with Timeout Policy","Mandatory without Timeout","Not Enforced"]},
-{name:"Admin access restricted to managed devices",desc:"Privileged device control",options:["Required for All Admin Roles","Required for Super Admins Only","Not Restricted"]}
+{name:"Device management enabled",desc:"Endpoint control active",recommended:"Advanced Management",options:makeOptions(["Advanced Management","Basic Management","Not Enabled"])},
+{name:"Device encryption enforced",desc:"Full disk encryption required",recommended:"Required Org-Wide",options:makeOptions(["Required Org-Wide","Required for Admins Only","Recommended Only","Not Enforced"])},
+{name:"Screen lock enforced",desc:"Mandatory device lock",recommended:"Mandatory with Timeout Policy",options:makeOptions(["Mandatory with Timeout Policy","Mandatory without Timeout","Not Enforced"])},
+{name:"Admin access restricted to managed devices",desc:"Privileged device control",recommended:"Required for All Admin Roles",options:makeOptions(["Required for All Admin Roles","Required for Super Admins Only","Not Restricted"])}
 ]},
 
 {
 section:"Google Drive Security",
 controls:[
-{name:"External sharing restricted",desc:"Sharing limited to allowlist",options:["Disabled Completely","Allowlisted Domains Only","Allowed with Warning","Fully Allowed"]},
-{name:"Public publishing disabled",desc:"No web publishing",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled"]},
-{name:"Default access set to Restricted",desc:"Private by default",options:["Restricted by Default","Internal Only","Anyone with Link","Not Configured"]},
-{name:"Access Checker set to Recipients Only",desc:"Link control enabled",options:["Recipients Only","Anyone with Warning","Disabled"]},
-{name:"Shared drive creation restricted",desc:"Limit sprawl",options:["Admin Only","Restricted Group Only","All Users"]},
-{name:"External collaborators require sign-in",desc:"No anonymous access",options:["Google Account Required","Trusted Domains Only","Anonymous Allowed"]},
-{name:"Offline docs disabled",desc:"Prevent local copies",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled"]},
-{name:"Desktop sync restricted",desc:"Limit Drive for desktop",options:["Disabled Org-Wide","Restricted to Specific Users","Fully Enabled"]},
-{name:"DLP rules configured",desc:"Sensitive data detection",options:["Block Sensitive Data Sharing","Warn Only","Monitor Only","Not Configured"]}
+{name:"External sharing restricted",desc:"Sharing limited to allowlist",recommended:"Disabled Completely",options:makeOptions(["Disabled Completely","Allowlisted Domains Only","Allowed with Warning","Fully Allowed"])},
+{name:"Public publishing disabled",desc:"No web publishing",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled"])},
+{name:"Default access set to Restricted",desc:"Private by default",recommended:"Restricted by Default",options:makeOptions(["Restricted by Default","Internal Only","Anyone with Link","Not Configured"])},
+{name:"Access Checker set to Recipients Only",desc:"Link control enabled",recommended:"Recipients Only",options:makeOptions(["Recipients Only","Anyone with Warning","Disabled"])},
+{name:"Shared drive creation restricted",desc:"Limit sprawl",recommended:"Admin Only",options:makeOptions(["Admin Only","Restricted Group Only","All Users"])},
+{name:"External collaborators require sign-in",desc:"No anonymous access",recommended:"Google Account Required",options:makeOptions(["Google Account Required","Trusted Domains Only","Anonymous Allowed"])},
+{name:"Offline docs disabled",desc:"Prevent local copies",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Sensitive OUs","Enabled"])},
+{name:"Desktop sync restricted",desc:"Limit Drive for desktop",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Restricted to Specific Users","Fully Enabled"])},
+{name:"DLP rules configured",desc:"Sensitive data detection",recommended:"Block Sensitive Data Sharing",options:makeOptions(["Block Sensitive Data Sharing","Warn Only","Monitor Only","Not Configured"])}
 ]},
 
 {
 section:"Gmail Security",
 controls:[
-{name:"SPF configured",desc:"Domain authentication",options:["Configured & Verified","Configured (Unverified)","Not Configured"]},
-{name:"DKIM enabled",desc:"Email signing",options:["Enabled with Key Rotation","Enabled","Not Enabled"]},
-{name:"DMARC enforced",desc:"Anti-spoofing policy",options:["p=reject","p=quarantine","p=none","Not Configured"]},
-{name:"TLS required for partners",desc:"Secure email transport",options:["Required for All Partners","Required for Specific Domains","Opportunistic TLS Only","Not Configured"]},
-{name:"IMAP/POP disabled",desc:"Reduce data exfiltration",options:["Disabled Org-Wide","Disabled for Most Users","Enabled for Approved Users","Fully Enabled"]},
-{name:"Auto-forwarding disabled",desc:"Prevent silent leaks",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Allowed with Approval","Fully Enabled"]},
-{name:"Enhanced phishing protection enabled",desc:"Advanced scanning",options:["Enabled Org-Wide","Enabled for Selected OUs","Standard Only","Not Enabled"]},
-{name:"Attachment protection enabled",desc:"Malware detection",options:["Enhanced Enabled","Standard Only","Disabled"]},
-{name:"Link protection enabled",desc:"Phishing URL blocking",options:["Enhanced Enabled","Standard Only","Disabled"]},
-{name:"Spoofing protection enabled",desc:"Anti-impersonation",options:["Enhanced Enabled","Standard Only","Disabled"]},
-{name:"Spam filter not bypassed internally",desc:"No spoof loopholes",options:["Bypass Disabled","Bypass Enabled for Specific Groups","Bypass Fully Enabled"]},
-{name:"DLP scanning for outgoing email",desc:"Sensitive data blocking",options:["Block Sensitive Content","Warn Only","Monitor Only","Not Configured"]}
+{name:"SPF configured",desc:"Domain authentication",recommended:"Configured & Verified",options:makeOptions(["Configured & Verified","Configured (Unverified)","Not Configured"])},
+{name:"DKIM enabled",desc:"Email signing",recommended:"Enabled with Key Rotation",options:makeOptions(["Enabled with Key Rotation","Enabled","Not Enabled"])},
+{name:"DMARC enforced",desc:"Anti-spoofing policy",recommended:"p=reject",options:makeOptions(["p=reject","p=quarantine","p=none","Not Configured"])},
+{name:"TLS required for partners",desc:"Secure email transport",recommended:"Required for All Partners",options:makeOptions(["Required for All Partners","Required for Specific Domains","Opportunistic TLS Only","Not Configured"])},
+{name:"IMAP/POP disabled",desc:"Reduce data exfiltration",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Most Users","Enabled for Approved Users","Fully Enabled"])},
+{name:"Auto-forwarding disabled",desc:"Prevent silent leaks",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Sensitive OUs","Allowed with Approval","Fully Enabled"])},
+{name:"Enhanced phishing protection enabled",desc:"Advanced scanning",recommended:"Enabled Org-Wide",options:makeOptions(["Enabled Org-Wide","Enabled for Selected OUs","Standard Only","Not Enabled"])},
+{name:"Attachment protection enabled",desc:"Malware detection",recommended:"Enhanced Enabled",options:makeOptions(["Enhanced Enabled","Standard Only","Disabled"])},
+{name:"Link protection enabled",desc:"Phishing URL blocking",recommended:"Enhanced Enabled",options:makeOptions(["Enhanced Enabled","Standard Only","Disabled"])},
+{name:"Spoofing protection enabled",desc:"Anti-impersonation",recommended:"Enhanced Enabled",options:makeOptions(["Enhanced Enabled","Standard Only","Disabled"])},
+{name:"Spam filter not bypassed internally",desc:"No spoof loopholes",recommended:"Bypass Disabled",options:makeOptions(["Bypass Disabled","Bypass Enabled for Specific Groups","Bypass Fully Enabled"])},
+{name:"DLP scanning for outgoing email",desc:"Sensitive data blocking",recommended:"Block Sensitive Content",options:makeOptions(["Block Sensitive Content","Warn Only","Monitor Only","Not Configured"])}
 ]},
 
 {
 section:"Google Groups Security",
 controls:[
-{name:"Group creation restricted to admins",desc:"Prevent group sprawl",options:["Admin Only","Restricted Users","All Users"]},
-{name:"Security groups used for access control",desc:"Secure resource control",options:["Used for All Sensitive Resources","Used for Some Resources","Not Used"]},
-{name:"External posting disabled for internal groups",desc:"Reduce data leaks",options:["Disabled Org-Wide","Disabled for Internal Groups Only","Fully Enabled"]},
-{name:"Public access disabled",desc:"No internet access",options:["Disabled","Restricted","Public"]},
-{name:"Spam moderation enabled",desc:"Reduce phishing",options:["Auto Reject Spam","Moderator Approval Required","Not Enabled"]}
+{name:"Group creation restricted to admins",desc:"Prevent group sprawl",recommended:"Admin Only",options:makeOptions(["Admin Only","Restricted Users","All Users"])},
+{name:"Security groups used for access control",desc:"Secure resource control",recommended:"Used for All Sensitive Resources",options:makeOptions(["Used for All Sensitive Resources","Used for Some Resources","Not Used"])},
+{name:"External posting disabled for internal groups",desc:"Reduce data leaks",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Internal Groups Only","Fully Enabled"])},
+{name:"Public access disabled",desc:"No internet access",recommended:"Disabled",options:makeOptions(["Disabled","Restricted","Public"])},
+{name:"Spam moderation enabled",desc:"Reduce phishing",recommended:"Auto Reject Spam",options:makeOptions(["Auto Reject Spam","Moderator Approval Required","Not Enabled"])}
 ]},
 
 {
 section:"Google Sites",
 controls:[
-{name:"External site sharing blocked",desc:"Prevent public leaks",options:["Disabled Org-Wide","Disabled for Sensitive OUs","Fully Enabled"]}
+{name:"External site sharing blocked",desc:"Prevent public leaks",recommended:"Disabled Org-Wide",options:makeOptions(["Disabled Org-Wide","Disabled for Sensitive OUs","Fully Enabled"])}
 ]},
 
 {
 section:"Vault",
 controls:[
-{name:"Vault admin accounts protected",desc:"Treated like super admins",options:["MFA + Security Keys Required","MFA Required","Standard Protection"]},
-{name:"Vault activity audited regularly",desc:"Monitor exports & retention",options:["Monthly","Quarterly","Annually","Not Reviewed"]}
+{name:"Vault admin accounts protected",desc:"Treated like super admins",recommended:"MFA + Security Keys Required",options:makeOptions(["MFA + Security Keys Required","MFA Required","Standard Protection"])},
+{name:"Vault activity audited regularly",desc:"Monitor exports & retention",recommended:"Monthly",options:makeOptions(["Monthly","Quarterly","Annually","Not Reviewed"])}
 ]},
 
 {
 section:"Monitoring & Audit",
 controls:[
-{name:"Security Center reviewed monthly",desc:"Posture visibility",options:["Reviewed Monthly","Reviewed Quarterly","Reviewed Annually","Not Reviewed"]},
-{name:"Admin audit logs reviewed monthly",desc:"Track admin activity",options:["Reviewed Weekly","Reviewed Monthly","Reviewed Quarterly","Not Reviewed"]},
-{name:"Incident investigation process defined",desc:"Response playbook exists",options:["Documented & Tested","Documented Only","Informal Process","No Defined Process"]}
+{name:"Security Center reviewed monthly",desc:"Posture visibility",recommended:"Reviewed Monthly",options:makeOptions(["Reviewed Monthly","Reviewed Quarterly","Reviewed Annually","Not Reviewed"])},
+{name:"Admin audit logs reviewed monthly",desc:"Track admin activity",recommended:"Reviewed Monthly",options:makeOptions(["Reviewed Monthly","Reviewed Weekly","Reviewed Quarterly","Not Reviewed"])},
+{name:"Incident investigation process defined",desc:"Response playbook exists",recommended:"Documented & Tested",options:makeOptions(["Documented & Tested","Documented Only","Informal Process","No Defined Process"])}
 ]}
-]
-;
 
-// ============ LOGIC ============
+];
 
+// ---------- STATE ----------
 
-
-// STATE
-function getState() {
+function getState(){
   const rows=document.querySelectorAll("tr[data-id]");
   const state={};
   rows.forEach(r=>{
-    state[r.dataset.id]={
-      status:r.querySelector(".status").value,
-      owner:r.querySelector(".owner").value,
-      evidence:r.querySelector(".evidence").value
-    };
+    state[r.dataset.id]={status:r.querySelector(".status").value};
   });
   return state;
 }
@@ -295,7 +248,7 @@ function exportJSON(){
   const blob=new Blob([JSON.stringify(getState(),null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
-  a.href=url; a.download="Checklist_State.json"; a.click();
+  a.href=url;a.download="Checklist_State.json";a.click();
 }
 
 function importJSON(e){
@@ -308,44 +261,38 @@ function importJSON(e){
   reader.readAsText(e.target.files[0]);
 }
 
-function exportPDF(){ html2pdf().from(document.body).save("Checklist.pdf"); }
+function exportPDF(){ html2pdf().from(document.body).save("Compliance_Report.pdf"); }
+
+// ---------- RENDER ----------
 
 const app=document.getElementById("app");
-const sideNav=document.getElementById("sideNav");
 
 checklist.forEach((section,sIndex)=>{
 
-  // Side nav
-  const navBtn=document.createElement("button");
-  navBtn.innerText=section.section;
-  navBtn.onclick=()=>document.getElementById("sec-"+sIndex).scrollIntoView({behavior:"smooth"});
-  sideNav.appendChild(navBtn);
-
   const wrapper=document.createElement("div");
+  wrapper.className="glass p-6";
   wrapper.id="sec-"+sIndex;
-  wrapper.className="glass p-6 fade";
 
   wrapper.innerHTML=`
-    <h2 class="text-xl font-semibold mb-4">${section.section}</h2>
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm border border-slate-300 rounded-xl overflow-hidden">
-        <thead class="bg-slate-100 text-xs uppercase">
-          <tr>
-            <th class="px-4 py-3 border">Control</th>
-            <th class="px-4 py-3 border">Description</th>
-            <th class="px-4 py-3 border">Status</th>
-            <th class="px-4 py-3 border">Owner</th>
-            <th class="px-4 py-3 border">Evidence</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>`;
+  <h2 class="text-xl font-semibold mb-4">${section.section} <span class="ml-2 text-sm text-indigo-600" id="secScore-${sIndex}">0%</span></h2>
+  <div class="overflow-x-auto">
+  <table class="min-w-full text-sm border border-slate-300 rounded-xl overflow-hidden">
+  <thead class="bg-slate-100 text-xs uppercase">
+  <tr>
+  <th class="px-4 py-3 border">Control</th>
+  <th class="px-4 py-3 border">Status</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+  </table>
+  </div>
+  `;
 
   app.appendChild(wrapper);
   const tbody=wrapper.querySelector("tbody");
 
   section.controls.forEach((control,cIndex)=>{
+
     const id=`${sIndex}-${cIndex}`;
     const saved=savedState[id]||{};
 
@@ -353,34 +300,61 @@ checklist.forEach((section,sIndex)=>{
     row.dataset.id=id;
 
     row.innerHTML=`
-      <td class="px-4 py-3 border font-medium">${control.name}</td>
-      <td class="px-4 py-3 border text-slate-600">${control.desc}</td>
-      <td class="px-4 py-3 border">
-        <select class="status w-full p-2 border rounded-lg">
-          <option value="">Select</option>
-          ${control.options.map(o=>`<option ${saved.status===o?"selected":""}>${o}</option>`).join("")}
-        </select>
-      </td>
-      <td class="px-4 py-3 border"><input type="text" value="${saved.owner||""}" class="owner w-full p-2 border rounded-lg"></td>
-      <td class="px-4 py-3 border"><input type="text" value="${saved.evidence||""}" class="evidence w-full p-2 border rounded-lg"></td>
+    <td class="px-4 py-3 border">
+      <div class="font-medium">${control.name}</div>
+      <div class="text-xs text-slate-500">${control.desc}</div>
+      <div class="text-xs text-emerald-600 mt-1">Recommended: ${control.recommended}</div>
+    </td>
+    <td class="px-4 py-3 border">
+      <select class="status w-full p-2 border rounded-lg">
+        <option value="">Select</option>
+        ${control.options.map(o=>`
+          <option value="${o.label}" data-score="${o.score}" ${saved.status===o.label?"selected":""}>
+            ${o.label}
+          </option>`).join("")}
+      </select>
+    </td>
     `;
+
     tbody.appendChild(row);
   });
-
 });
 
+// ---------- SCORING ----------
+
 function updateProgress(){
-  const selects=document.querySelectorAll(".status");
-  let filled=0;
-  selects.forEach(s=>{ if(s.value)filled++; });
-  const percent=Math.round((filled/selects.length)*100);
-  document.getElementById("overallPercent").innerText=percent+"%";
-  document.getElementById("overallBar").style.width=percent+"%";
+
+  let totalScore=0;
+  let totalControls=0;
+
+  checklist.forEach((section,sIndex)=>{
+
+    let sectionScore=0;
+
+    section.controls.forEach((control,cIndex)=>{
+
+      const id=`${sIndex}-${cIndex}`;
+      const row=document.querySelector(`tr[data-id="${id}"]`);
+      const select=row.querySelector(".status");
+      const selected=select.options[select.selectedIndex];
+      const score=selected?Number(selected.dataset.score||0):0;
+
+      sectionScore+=score;
+      totalScore+=score;
+      totalControls++;
+    });
+
+    const secPercent=Math.round(sectionScore/section.controls.length);
+    document.getElementById(`secScore-${sIndex}`).innerText=secPercent+"%";
+  });
+
+  const overallPercent=Math.round(totalScore/totalControls);
+  document.getElementById("overallPercent").innerText=overallPercent+"%";
+  document.getElementById("overallBar").style.width=overallPercent+"%";
   saveState();
 }
 
 document.addEventListener("change",updateProgress);
-document.addEventListener("input",saveState);
 updateProgress();
 
 </script>
